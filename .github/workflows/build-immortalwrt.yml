@@ -188,6 +188,14 @@ jobs:
         cd /work/openwrt/immortalwrt
         make -j$(nproc) V=s 2>&1 | tee build.log | grep -E '^make|ERROR:|Error |error:'
 
+    - name: List firmware files
+      run: |
+        cd /work/openwrt/immortalwrt/bin/targets/x86/64
+        echo "=== All img.gz files ==="
+        ls -la *.img.gz 2>/dev/null || echo "No img.gz files"
+        echo "=== File sizes ==="
+        du -sh *.img.gz 2>/dev/null
+
     - name: Upload log
       if: always()
       uses: actions/upload-artifact@v4
@@ -199,6 +207,7 @@ jobs:
     - name: Upload firmware
       uses: actions/upload-artifact@v4
       with:
-        name: ImmortalWrt-x86-64-squashfs-combined
-        path: /work/openwrt/immortalwrt/bin/targets/x86/64/*-squashfs-combined.img.gz
+        name: ImmortalWrt-x86_64-Firmware
+        path: /work/openwrt/immortalwrt/bin/targets/x86/64/*squashfs*combined*img.gz
+        if-no-files-found: warn
         retention-days: 14
