@@ -185,7 +185,7 @@ jobs:
       id: compile
       run: |
         cd /work/openwrt/lede
-        make -j$(nproc) V=s 2>&1 | tee build.log | grep -E '^make|ERROR:|Error |error:'
+        make -j$(nproc) V=s 2>&1 | tee build.log
 
     - name: Upload log
       if: always()
@@ -195,11 +195,23 @@ jobs:
         path: /work/openwrt/lede/build.log
         retention-days: 3
 
+    - name: List firmware files
+      run: |
+        cd /work/openwrt/lede/bin/targets/x86/64
+        echo "=== All files ==="
+        ls -la
+        echo "=== img.gz files ==="
+        ls -la *.img.gz 2>/dev/null || echo "No img.gz files found"
+        echo "=== Looking for firmware ==="
+        find . -name "*.img.gz" -o -name "*.img" | head -20
+
     - name: Upload firmware
       uses: actions/upload-artifact@v4
       with:
-        name: Lean-LEDE-x86_64-Full
+        name: Lean-LEDE-x86_64-Firmware
         path: |
-          /work/openwrt/lede/bin/targets/x86/64/*.img.gz
+          /work/openwrt/lede/bin/targets/x86/64/*squashfs*img.gz
+          /work/openwrt/lede/bin/targets/x86/64/*combined*img.gz
           /work/openwrt/lede/bin/targets/x86/64/sha256sums
+        if-no-files-found: warn
         retention-days: 14
