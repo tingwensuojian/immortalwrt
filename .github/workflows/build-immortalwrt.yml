@@ -171,6 +171,11 @@ jobs:
         CFGEOF
         make defconfig
 
+    - name: Set LAN IP to 192.168.2.1
+      run: |
+        cd /work/openwrt/immortalwrt
+        sed -i 's/192.168.1.1/192.168.2.1/g' package/base-files/files/bin/config_generate
+
     - name: Download
       run: |
         cd /work/openwrt/immortalwrt
@@ -195,5 +200,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ImmortalWrt-x86_64-Full
-        path: /work/openwrt/immortalwrt/bin/targets/x86/64/*
+        path: |
+          /work/openwrt/immortalwrt/bin/targets/x86/64/*.img.gz
+          /work/openwrt/immortalwrt/bin/targets/x86/64/sha256sums
         retention-days: 14
